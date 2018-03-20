@@ -1,0 +1,101 @@
+\documentclass[11pt, onecolumn]{scrartcl}
+
+\usepackage[top=1.5cm]{geometry}
+\usepackage{import}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{enumerate}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.5em}
+
+\newcommand{\urlfootnote}[1]{\footnote{\url{#1}}}
+
+% \begin{packed_item}, \end{packed_item}
+\newenvironment{packed_item}{
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+% \begin{packed_enum}, \end{packed_enum}
+\newenvironment{packed_enum}[1][1.]{
+\begin{enumerate}[#1]
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+% \begin{vroadmap}, \end{vroadmap}
+\newcommand{\tldot}{\makebox[0pt]{\textbullet}\hskip-0.5pt\vrule width 1pt\hspace{\labelsep}}
+\newenvironment{vroadmap}{
+  \begin{table}[ht!]
+    \renewcommand\arraystretch{1.4}
+    \centering
+    \begin{tabular}{@{\,}r <{\hskip 2pt} !{\tldot} >{\raggedright\arraybackslash}p{0.6875\textwidth}}
+      \toprule
+      \addlinespace[1.5ex]
+}{
+      \addlinespace[1.5ex]
+      \bottomrule
+    \end{tabular}
+  \end{table}
+}
+
+\title{
+  Project Report \\[24pt]
+  \normalsize\textbf{
+    PS Non-Standard Database Systems \\
+    Summer term 2018 \\[12pt]
+    Department of Computer Sciences \\
+    University of Salzburg}}
+
+\author{
+  Group Number \\
+  \large Lastname1 Firstname1, StudentID1 \\
+  \large Lastname2 Firstname2, StudentID2 \\
+  \large Lastname3 Firstname3, StudentID3}
+
+\begin{document}
+
+\maketitle
+
+\paragraph{Remove This Paragraph Before Submission}
+
+This report is composed of \emph{four} checkpoint-related files
+(\texttt{cp1.tex} - \texttt{cp4.tex}), \emph{one} feedback-related
+(\texttt{feedback.tex}), and \emph{one} bibliography file
+(\texttt{bibliography.bib}). For checkpoint 02 - 04, the files will be made
+available separately -- just put them in the same directory as this file and it
+should compile just fine.
+
+This template contains the most important elements your report is supposed to
+cover. However, it is recommended that you mention anything that helps the
+reader to understand the contents of the report. You \emph{may} change the
+formatting of the report if you want.
+
+% 1. checkpoint
+\IfFileExists{cp1.tex}{\subimport{./}{cp1.tex}}{}
+
+% 2. checkpoint
+\IfFileExists{cp2.tex}{\subimport{./}{cp2.tex}}{}
+
+% 3. checkpoint
+\IfFileExists{cp3.tex}{\subimport{./}{cp3.tex}}{}
+
+% 4. checkpoint
+\IfFileExists{cp4.tex}{\subimport{./}{cp4.tex}}{}
+
+% feedback
+\IfFileExists{feedback.tex}{\subimport{./}{feedback.tex}}
+
+% references
+\IfFileExists{bibliography.bib}{
+  \renewcommand{\refname}{References}
+  \bibliographystyle{abbrv}
+  \bibliography{bibliography}}
+
+\end{document}
