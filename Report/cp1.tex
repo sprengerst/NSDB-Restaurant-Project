@@ -11,7 +11,7 @@ TODO All (2 Papers Fabian)
 
 \begin{packed_enum}
    \item
-As Bigtable we understand a distributed storage that is scaleable for a very large size of data. It is stated that many big projects like, Google Earth, Google Analytics and Google Finance, make use of the Bigtable technology. For services in this dimension, such a system has to be stable in latency and also should be able to handle huge data size. Bigtable therefor is a technology that meets this high demand needs. It works with clustering where you can simply add more machines to the system for more demanding applications.  \cite{bigTable}
+As Bigtable we understand a distributed storage that is scaleable for a very large size of data. It is stated that many big projects like, Google Earth, Google Analytics and Google Finance, make use of the Bigtable technology. For services in this dimension, such a system has to be stable in latency and also should be able to handle huge data size. Bigtable therefor is a technology that meets this high demand needs. It works with clustering, where you can simply add more machines to the system for more demanding applications.  \cite{bigTable}
    \item \ldots
    \item \ldots
    \item \ldots
@@ -20,21 +20,22 @@ As Bigtable we understand a distributed storage that is scaleable for a very lar
 
 \subsection{System}
 
-We chose MongoDB as the basis for our project.
+We have chosen MongoDB as the basis for our project.
 
-\paragraph{Rationale} Why is this type of system interesting to you? (1-2
-paragraphs)
+\paragraph{Rationale} Why is this type of system interesting to us? 
 
-TODO Stefan
+As MongoDB is a very widely spread system, it is also very often used in practice. Since all three of us are working in software companies, we are very interested in using and learning real-life technology. We think that MongoDB is most likey to be used in a work place environment. \\ 
 
-In the following, discuss \emph{four} interesting
-features/capabilities/properties of the chosen system (1 paragraph each).
+Beside from this, we also have a little insight in some of the data structures used there, so we would like to try them out in practice. We think the column- and document- oriented approaches which MongoDB are offering are a huge benefit for our project.
+
+\paragraph{Features} 
+
 \begin{packed_enum}
-    \item \ldots
-    \item \ldots
-    \item \ldots
-    \item \ldots
-    \item Additional features/capabilities/properties \ldots
+    \item JSON Like Documents - Data is stored in a flexible way. So it can vary from document to document. This means the data structure is interchangeable anytime without changing the complete database definition.
+    \item Document Model - There is a document model which can be used to map objects in application code, so no confusing String handling is necessary for querying.
+    \item Ad hoc queries, indexing and real time aggregation - MongoDB is one of the most stable NoSql solutions and for our purpose with its indexing fast enough.
+    \item Distributability and Clustering - MongoDB is horizontal scaling and geographically distributeable, so if we would need more computational resources we could provide them easily. 
+    \item Free and Open Source - As a completly free project there is a huge community and good documentation, so it's easier to use and learn than other not so well documented systems.\ldots
 \end{packed_enum}
 
 \subsection{Application Description}
@@ -53,13 +54,14 @@ deployment, \ldots
 
 TODO Daniel
 
-\paragraph{Experimental Data}
+\paragraph{Experimental Data - Google Places}
 
-For each dataset, describe the origin as well as the properties/contents.
-Moreover, justify why the respective datasets suit your application (2-3
-paragraphs each).
+\url{https://developers.google.com/places/}
 
-TODO Stefan
+We use the Google Places Api with a filter on restaurants. This api takes a latitude/ longitude pair and a radius as input and returns a list (limited by 20 entries) of restaurants. We have to write a JSON Crawler to get more than 20 entries, so we can have a higher area covered by our restaurant list. \\
+
+The data suits our application, because it's easy to parse (JSON) and easy to distribute the data into documents by latitude/longitude pairs. Also our planned data access is by design matching MongoDBs architecture, so we will only have to look up in one document for one join.
+
 
 \subsection{Roadmap}
 
