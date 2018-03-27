@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
+import net.simonvt.schematic.annotation.InexactContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
 
@@ -34,5 +35,19 @@ public class RestaurantFeedProvider {
                 type = "vnd.android.cursor.dir/"+ AppDatabase.RESTAURANT_FEED
         )
         public static final Uri CONTENT_URI = buildUri(Path.RESTAURANT_FEED);
+    }
+
+
+
+
+    @InexactContentUri(
+            name = "Restaurant_ID",
+            path = Path.RESTAURANT_FEED + "/#",
+            type = "vnd.android.cursor.item/" + AppDatabase.RESTAURANT_FEED,
+            whereColumn = {RestaurantColumns.RESTAURANT_ID},
+            pathSegment = {1}
+    )
+    public static Uri withRestaurantID(int id) {
+        return buildUri(Path.RESTAURANT_FEED, String.valueOf(id));
     }
 }

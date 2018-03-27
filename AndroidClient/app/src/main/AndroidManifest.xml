@@ -28,6 +28,9 @@
             android:authorities="inc.uni.salzburg.data.restaurantFeed"
             android:exported="false" />
 
+        <!--Services-->
+        <service android:name=".services.RestaurantFetchService" />
+
     </application>
 
 </manifest>

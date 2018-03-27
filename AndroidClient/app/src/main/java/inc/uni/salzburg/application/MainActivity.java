@@ -1,10 +1,9 @@
 package inc.uni.salzburg.application;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -17,6 +16,7 @@ import android.view.View;
 
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.database.RestaurantFeedProvider;
+import inc.uni.salzburg.services.RestaurantFetchService;
 import inc.uni.salzburg.utilities.Statics;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -24,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int RESTAURANT_FEED_LOADER = 1223;
 
     private RestaurantSwipePagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
+    private View mProgressView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,20 +37,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mSectionsPagerAdapter = new RestaurantSwipePagerAdapter(getSupportFragmentManager(), MainActivity.this, null);
 
-        ViewPager mViewPager = findViewById(R.id.container);
+        mViewPager = findViewById(R.id.contentViewPager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        mProgressView = findViewById(R.id.loadingView);
 
+        mViewPager.setVisibility(View.GONE);
+        mProgressView.setVisibility(View.VISIBLE);
         getSupportLoaderManager().initLoader(RESTAURANT_FEED_LOADER, null, this);
 
+       startService(new Intent(MainActivity.this, RestaurantFetchService.class));
 
     }
 
@@ -101,6 +99,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if (loader.getId() == RESTAURANT_FEED_LOADER) {
             mSectionsPagerAdapter.setCursor(data);
+
+            if(data.getCount() != 0){
+                mViewPager.setVisibility(View.VISIBLE);
+                mProgressView.setVisibility(View.GONE);
+            }else {
+                mViewPager.setVisibility(View.GONE);
+                mProgressView.setVisibility(View.VISIBLE);
+            }
+
         }
     }
 }

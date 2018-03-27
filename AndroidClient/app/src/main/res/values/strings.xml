@@ -2,4 +2,7 @@
     <string name="app_name">NSDB-Restaurant-App</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+
+    <string name="dummy_image_url">https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/6x8_80dpi_-_Piment_rouge_-_view_of_cellar_fm_mezz_stairs_to_Peel.JPG/220px-6x8_80dpi_-_Piment_rouge_-_view_of_cellar_fm_mezz_stairs_to_Peel.JPG</string>
 </resources>
