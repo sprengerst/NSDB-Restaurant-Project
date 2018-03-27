@@ -9,14 +9,25 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.database.RestaurantFeedProvider;
+import inc.uni.salzburg.services.GeoCodingTask;
 import inc.uni.salzburg.services.RestaurantFetchService;
+import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
 import inc.uni.salzburg.utilities.Statics;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -26,14 +37,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private RestaurantSwipePagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private View mProgressView;
+    private ActionMenuView leftToolbarMenu;
+    private TextView mLocationTextView;
+
+    private static final int REQUEST_LOCATION_MAIN = 9874;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar_home_logo);
+        leftToolbarMenu = toolbar.findViewById(R.id.action_menu_toolbar);
+        leftToolbarMenu.setOnMenuItemClickListener(new ActionMenuView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return onOptionsItemSelected(menuItem);
+            }
+        });
+
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+
 
         mSectionsPagerAdapter = new RestaurantSwipePagerAdapter(getSupportFragmentManager(), MainActivity.this, null);
 
@@ -46,31 +75,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mProgressView.setVisibility(View.VISIBLE);
         getSupportLoaderManager().initLoader(RESTAURANT_FEED_LOADER, null, this);
 
-       startService(new Intent(MainActivity.this, RestaurantFetchService.class));
+        startService(new Intent(MainActivity.this, RestaurantFetchService.class));
 
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        if (menu.size() == 0) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.menu_main, menu);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            // if left toolbar already initialized inflate
+            if (leftToolbarMenu.getMenu().size() == 0) {
+                getMenuInflater().inflate(R.menu.menu_home_advanced_toolbar, leftToolbarMenu.getMenu());
+
+                final MenuItem locationMenu = leftToolbarMenu.getMenu().findItem(R.id.location_menu_item);
+                final LinearLayout rootViewLocation = (LinearLayout) locationMenu.getActionView();
+                mLocationTextView = rootViewLocation.findViewById(R.id.current_location_menu);
+                rootViewLocation.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("MA", "Updating Location");
+                        try {
+                            if (ErrorHandlingUtilities.isNetworkAvailableWithToast(MainActivity.this)) {
+                                PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                                Intent intent = intentBuilder.build(MainActivity.this);
+                                startActivityForResult(intent, REQUEST_LOCATION_MAIN);
+                            }
+                        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                            Log.e("Main", "Error fetching Location " + e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
         }
 
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
 
@@ -100,14 +143,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (loader.getId() == RESTAURANT_FEED_LOADER) {
             mSectionsPagerAdapter.setCursor(data);
 
-            if(data.getCount() != 0){
+            if (data.getCount() != 0) {
                 mViewPager.setVisibility(View.VISIBLE);
                 mProgressView.setVisibility(View.GONE);
-            }else {
+            } else {
                 mViewPager.setVisibility(View.GONE);
                 mProgressView.setVisibility(View.VISIBLE);
             }
 
         }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+//        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+//            fragment.onActivityResult(requestCode, resultCode, data);
+//        }
+
+        if (requestCode == REQUEST_LOCATION_MAIN) {
+            if (resultCode == RESULT_OK) {
+                if ((data != null) && (data.getExtras() != null)) {
+                    Place place = PlacePicker.getPlace(MainActivity.this, data);
+                    Log.d("MainActivity", "LOCAL: " + place.getLocale() + " Name: " + place.getName());
+                    new GeoCodingTask(this, mLocationTextView, (float) place.getLatLng().latitude, (float) place.getLatLng().longitude).execute();
+                }
+            }
+        }
+
     }
 }

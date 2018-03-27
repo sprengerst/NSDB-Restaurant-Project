@@ -38,14 +38,12 @@ public class RestaurantFeedProvider {
     }
 
 
-
-
     @InexactContentUri(
-            name = "Restaurant_ID",
-            path = Path.RESTAURANT_FEED + "/#",
+            name = "RESTAURANT_FEED_ID",
+            path = Path.RESTAURANT_FEED + "/*",
             type = "vnd.android.cursor.item/" + AppDatabase.RESTAURANT_FEED,
             whereColumn = {RestaurantColumns.RESTAURANT_ID},
-            pathSegment = {1}
+            pathSegment = 1
     )
     public static Uri withRestaurantID(int id) {
         return buildUri(Path.RESTAURANT_FEED, String.valueOf(id));

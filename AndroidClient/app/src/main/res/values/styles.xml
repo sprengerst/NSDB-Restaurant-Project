@@ -17,4 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ActionBar">
+        <item name="titleTextColor">#fff</item>
+    </style>
+
 </resources>

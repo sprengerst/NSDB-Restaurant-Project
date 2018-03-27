@@ -6,7 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.model.Restaurant;
@@ -36,8 +40,14 @@ public class RestaurantViewItemFragment extends Fragment {
 
             View rootView = inflater.inflate(R.layout.fragment_restaurant_view_item, container, false);
             TextView restaurantName = rootView.findViewById(R.id.restaurant_name);
-
             restaurantName.setText(restaurant.getName());
+
+            ImageView restaurantImage = rootView.findViewById(R.id.restaurant_image);
+            Glide.with(getContext())
+                    .load(restaurant.getImageUrl())
+                    .apply(new RequestOptions().centerCrop())
+                    .into(restaurantImage);
+
             return rootView;
         } else {
             return null;

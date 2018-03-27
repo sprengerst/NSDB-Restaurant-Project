@@ -80,8 +80,8 @@ public class RestaurantFetchService extends IntentService {
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
 
             for (Restaurant singleRestaurant : dummyRestaurantList) {
-                boolean alreadyInLocalDB = ModelUtils.checkForRestaurantExistentByID(singleRestaurant.getId(), this);
-                batchOperations.add(buildAddUpdateRestaurantSuggestionOperation(alreadyInLocalDB, singleRestaurant));
+//                boolean alreadyInLocalDB = ModelUtils.checkForRestaurantExistentByID(singleRestaurant.getId(), this);
+                batchOperations.add(buildAddUpdateRestaurantSuggestionOperation(false, singleRestaurant));
             }
             // add new suggestions
             context.getContentResolver().applyBatch(RestaurantFeedProvider.AUTHORITY, batchOperations);
