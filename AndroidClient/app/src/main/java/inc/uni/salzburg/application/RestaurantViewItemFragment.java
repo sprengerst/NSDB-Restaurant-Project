@@ -1,0 +1,46 @@
+package inc.uni.salzburg.application;
+
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import inc.uni.salzburg.R;
+import inc.uni.salzburg.model.Restaurant;
+
+
+public class RestaurantViewItemFragment extends Fragment {
+
+    private static final String ARG_RESTAURANT = "arg_restaurant";
+
+    public RestaurantViewItemFragment() {
+    }
+
+    public static RestaurantViewItemFragment newInstance(Restaurant restaurant) {
+        RestaurantViewItemFragment fragment = new RestaurantViewItemFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_RESTAURANT, restaurant);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        if (getArguments() != null && getArguments().getParcelable(ARG_RESTAURANT) != null) {
+            Restaurant restaurant = getArguments().getParcelable(ARG_RESTAURANT);
+
+            View rootView = inflater.inflate(R.layout.fragment_restaurant_view_item, container, false);
+            TextView restaurantName = rootView.findViewById(R.id.restaurant_name);
+
+            restaurantName.setText(restaurant.getName());
+            return rootView;
+        } else {
+            return null;
+        }
+    }
+}
