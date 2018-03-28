@@ -25,6 +25,8 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.database.RestaurantFeedProvider;
+import inc.uni.salzburg.database.UserSessionUtilities;
+import inc.uni.salzburg.model.UserSession;
 import inc.uni.salzburg.services.GeoCodingTask;
 import inc.uni.salzburg.services.RestaurantFetchService;
 import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
@@ -46,6 +48,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(MainActivity.this);
+        if (userSession == null) {
+            userSession = new UserSession(null, -1, -1);
+            UserSessionUtilities.updateUserSessionSP(MainActivity.this, userSession);
+        }
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar_home_logo);
@@ -110,17 +119,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         }
                     }
                 });
+
+                updateUserPositionToolbar();
+
             }
         }
 
         return true;
     }
 
+    private void updateUserPositionToolbar() {
+        final UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(MainActivity.this);
+        Log.d("MA", "Update user postion with: " + userSession.getGeoResolution());
+        if (userSession.getGeoResolution() == null) {
+            if (userSession.getLatitude() != -1 && userSession.getLongitude() != -1) {
+                new GeoCodingTask(this, mLocationTextView, userSession.getLatitude(), userSession.getLongitude()).execute();
+            }
+        } else {
+            updateUserLocationResolution(userSession.getGeoResolution());
+        }
+    }
+
+    public void updateUserLocationResolution(String resolution){
+        if(mLocationTextView != null) {
+            mLocationTextView.setText(resolution);
+        }
+    }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        if (loader.getId() == RESTAURANT_FEED_LOADER) {
-        }
     }
 
     @NonNull

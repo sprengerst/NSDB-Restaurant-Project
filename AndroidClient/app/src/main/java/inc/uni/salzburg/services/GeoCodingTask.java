@@ -20,6 +20,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import inc.uni.salzburg.R;
+import inc.uni.salzburg.database.UserSessionUtilities;
+import inc.uni.salzburg.model.UserSession;
 import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
 
 
@@ -46,9 +48,6 @@ public class GeoCodingTask extends AsyncTask<Void, Void, String> {
         }
     }
 
-
-
-
     @Override
     protected String doInBackground(Void... params) {
 
@@ -68,7 +67,7 @@ public class GeoCodingTask extends AsyncTask<Void, Void, String> {
                     .appendQueryParameter("latlng", latitude + "," + longitude)
                     .appendQueryParameter("result_type", "political")
                     .appendQueryParameter("language", "de")
-                    .appendQueryParameter("key", "XXX");
+                    .appendQueryParameter("key", "AIzaSyARIehNPlSxMWkosZ8BvvVc9hyeBiYc4aM");
 
 
 
@@ -178,6 +177,13 @@ public class GeoCodingTask extends AsyncTask<Void, Void, String> {
             if (insertTextView != null) {
                 insertTextView.setText(locationNameLong);
             }
+
+            // Update User Session
+            UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(mContext);
+            userSession.setGeoResolution(locationNameLong);
+            userSession.setLatitude(latitude);
+            userSession.setLongitude(longitude);
+            UserSessionUtilities.updateUserSessionSP(mContext, userSession);
 
         } else {
             if (ErrorHandlingUtilities.isNetworkAvailableWithToast(mContext)) {

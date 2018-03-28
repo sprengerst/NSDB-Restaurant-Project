@@ -42,4 +42,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
     compile 'com.github.bumptech.glide:glide:4.6.1'
 
+    // GSon Objects https://mvnrepository.com/artifact/com.google.code.gson/gson
+    compile 'com.google.code.gson:gson:2.8.2'
+
 }

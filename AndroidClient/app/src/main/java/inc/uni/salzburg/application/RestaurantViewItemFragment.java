@@ -14,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.model.Restaurant;
+import inc.uni.salzburg.utilities.CalculationUtilities;
 
 
 public class RestaurantViewItemFragment extends Fragment {
@@ -37,17 +38,26 @@ public class RestaurantViewItemFragment extends Fragment {
 
         if (getArguments() != null && getArguments().getParcelable(ARG_RESTAURANT) != null) {
             Restaurant restaurant = getArguments().getParcelable(ARG_RESTAURANT);
-
             View rootView = inflater.inflate(R.layout.fragment_restaurant_view_item, container, false);
-            TextView restaurantName = rootView.findViewById(R.id.restaurant_name);
-            restaurantName.setText(restaurant.getName());
 
-            ImageView restaurantImage = rootView.findViewById(R.id.restaurant_image);
-            Glide.with(getContext())
-                    .load(restaurant.getImageUrl())
-                    .apply(new RequestOptions().centerCrop())
-                    .into(restaurantImage);
+            if(restaurant != null) {
+                TextView restaurantName = rootView.findViewById(R.id.restaurant_name);
+                restaurantName.setText(restaurant.getName());
 
+                ImageView restaurantImage = rootView.findViewById(R.id.restaurant_image);
+                Glide.with(getContext())
+                        .load(restaurant.getImageUrl())
+                        .apply(new RequestOptions().centerCrop())
+                        .into(restaurantImage);
+
+                final String distanceString = String.format(
+                        getContext().getString(R.string.string_km_format),
+                        CalculationUtilities.calculateDistance(restaurant.getLatitude(), restaurant.getLongitude(), getContext()));
+
+                TextView restaurantDistance = rootView.findViewById(R.id.restaurant_distance);
+                restaurantDistance.setText(distanceString);
+
+            }
             return rootView;
         } else {
             return null;
