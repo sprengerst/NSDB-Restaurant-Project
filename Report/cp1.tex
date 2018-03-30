@@ -12,7 +12,22 @@ TODO All (2 Papers Fabian)
 \begin{packed_enum}
    \item
 As Bigtable we understand a distributed storage that is scaleable for a very large size of data. It is stated that many big projects like, Google Earth, Google Analytics and Google Finance, make use of the Bigtable technology. For services in this dimension, such a system has to be stable in latency and also should be able to handle huge data size. Bigtable therefor is a technology that meets this high demand needs. It works with clustering, where you can simply add more machines to the system for more demanding applications.  \cite{bigTable}
-   \item \ldots
+   \item 
+In the blog post "New Sql: An Alternative to Nosql and Old Sql For New Oltp Apps" the author Michael Stonebraker talks about Online
+Transaction Processing and how it's requirements have changed over the last years.
+Traditional a relational DBMS processed customer requests and a data warehouse stored 
+information in a common format to analyse or cross-sell information. In order to convert the OLTP data, a Extract-Transform-and-Load product was used. This system is described by the author as Old OLTP or Old SQL. 
+In Contrary New OLTP is needed for Web properties, and mostly defined by two requirements.
+On the one side, far more OLTP throughput is needed, since the number of interactions per second
+sharply rose on web-based applications (e.g. social networks). Another demand is the need for
+real-time analytics. (e.g. finding surrounding locations of a smartphone).
+
+Following, the author takes a look at Old SQL, NOSql and New SQL systems and how they deal with these requirements.
+However, Old SQL and NoSQL seem to give no satisfying solution. Since the capabilities of Old
+SQL may exceed the experience workflow and are incapable of providing real-time analytics.
+No SQL on the other side does not fully provide ACID. Which can be problematic for some applications.
+A solution could be the NewSQL systems. Which offer high performance and scalability as well as preserve ACID properties for transactions.
+
    \item \ldots
    \item \ldots
    \item Additional references \ldots
@@ -40,10 +55,15 @@ Beside from this, we also have a little insight in some of the data structures u
 
 \subsection{Application Description}
 
-Describe your application scenario (2-3 paragraphs) and justify why this
-fits your system of choice (1-2 paragraphs).
+We decided to write an Android application, which searches a random restaurant from the surrounding area. The idea came up during the time of my bachelor study. We often had problems, choosing a place to have lunch at, since no one wanted to make a final call on where to go.
 
-TODO Fabian
+The interface is a simple button, which sends a request to the database system with the current position. As a result, a list of restaurants is returned from which a random selection is made and given to the user. If he does not like the choice, it is possible to get another random selection by swiping away the location.
+
+The displayed data contains the name, location, homepage-link and opening hours of the restaurant. This data is stored in a database and contains restaurants from Salzburg and it's surroundings. 
+
+For our application we need a scalable database system with a fast response time. But since our data is not changed by the users, it is not required to fulfill the ACID properties. Hence, a NoSQL database is enough. A document based system makes sense, since the data used already is close to this format, with the location as a unique key for the rest of the information.
+
+
 
 \paragraph{Architectural Overview}
 
@@ -76,5 +96,3 @@ roadmap for the project/semester. You may use the \verb|vroadmap| environment
   YYYY-mm-dd & Step 2 \tabularnewline
   \ldots & \ldots \tabularnewline
 \end{vroadmap}
-
-
