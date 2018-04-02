@@ -1,50 +1,35 @@
 \section{Proposal}
 
 \subsection{Survey}
-
 This section is supposed to enumerate (at least) \emph{four} references and
 briefly summarize the main insight they provided (1 paragraph each). All
 references should also be included in the References section that concludes the
 report.
 
-TODO All (2 Papers Fabian)
-
 \begin{packed_enum}
-   \item
-As Bigtable we understand a distributed storage that is scaleable for a very large size of data. It is stated that many big projects like, Google Earth, Google Analytics and Google Finance, make use of the Bigtable technology. For services in this dimension, such a system has to be stable in latency and also should be able to handle huge data size. Bigtable therefor is a technology that meets this high demand needs. It works with clustering, where you can simply add more machines to the system for more demanding applications.  \cite{bigTable}
-   \item 
+\item
+As Bigtable we understand a distributed storage that is scaleable for a very large size of data. It is stated that many big projects like, Google Earth, Google Analytics and Google Finance, make use of the Bigtable technology. For services in this dimension, such a system has to be stable in latency and should also be able to handle huge data sizes. Bigtable therefore is a technology that meets this high demand needs. It works with clustering, where you can simply add more machines to the system for more demanding applications. \cite{Chang2008}
+\item 
 In the blog post "New Sql: An Alternative to Nosql and Old Sql For New Oltp Apps" the author Michael Stonebraker talks about Online
-Transaction Processing and how it's requirements have changed over the last years.
-Traditional a relational DBMS processed customer requests and a data warehouse stored 
-information in a common format to analyse or cross-sell information. In order to convert the OLTP data, a Extract-Transform-and-Load product was used. This system is described by the author as Old OLTP or Old SQL. 
-In Contrary New OLTP is needed for Web properties, and mostly defined by two requirements.
-On the one side, far more OLTP throughput is needed, since the number of interactions per second
-sharply rose on web-based applications (e.g. social networks). Another demand is the need for
-real-time analytics. (e.g. finding surrounding locations of a smartphone).
+Transaction Processing and how it's requirements have changed over the last years. Traditionally a relational DBMS processed customer requests and a data warehouse stored information in a common format to analyse or cross-sell information. In order to convert the OLTP data, a Extract-Transform-and-Load product was used. This system is described by the author as Old OLTP or Old SQL. In contrary New OLTP is needed for Web properties, and mostly defined by two requirements. On the one side, far more OLTP throughput is needed, since the number of interactions per second
+sharply rose on web-based applications (e.g. social networks). Another demand is the need for real-time analytics. (e.g. finding surrounding locations of a smartphone).
 
-Following, the author takes a look at Old SQL, NOSql and New SQL systems and how they deal with these requirements.
-However, Old SQL and NoSQL seem to give no satisfying solution. Since the capabilities of Old
-SQL may exceed the experience workflow and are incapable of providing real-time analytics.
-No SQL on the other side does not fully provide ACID. Which can be problematic for some applications.
-A solution could be the NewSQL systems. Which offer high performance and scalability as well as preserve ACID properties for transactions.
+Following, the author takes a look at Old SQL, NOSql and New SQL systems and how they deal with these requirements. However, Old SQL and NoSQL seem to give no satisfying solution. Since the capabilities of Old SQL may exceed the experience workflow and are incapable of providing real-time analytics.
+No SQL on the other side does not fully provide ACID. Which can be problematic for some applications. A solution could be the NewSQL systems. Which offer high performance and scalability as well as preserve ACID properties for transactions. \cite{Stonebraker2011}
 
-   \item 
-   Large-scale infrastructur services need among other things high availabity and perfomance.
-A way of achivieving this is to use eventual consitency. It is a form of weak consistency
-and guarantees that if no new updates are to an object, eventually all accesses will return
-the last updated value. The period where it's not guaranteed that every observer will see the
-updated value is called inconsitency window. It can be determined based on communication delays,
-the load of the system and the number of replicas involved in the replication scheme.
- 
-Trading consitency and durability for performance and availabity is not suitable for every
-application, but can yield advantages such as improving read and write perfomance under highly concurrent
-conditions and preventing unavailability. It is possible to improves evneutal consitency 
-by implementation certain properties, e.g. session-consitency or monotonic read consitency.
+\item 
+Large-scale infrastructur services need among other things high availabity and perfomance. A way of achivieving this is to use eventual consitency. It is a form of weak consistency and guarantees that if no new updates are to an object, eventually all accesses will return the last updated value. The period where it's not guaranteed that every observer will see the updated value is called inconsitency window. It can be determined based on communication delays, the load of the system and the number of replicas involved in the replication scheme.  
+Trading consitency and durability for performance and availabity is not suitable for every application, but can yield advantages such as improving read and write perfomance under highly concurrent conditions and preventing unavailability. It is possible to improves evneutal consitency 
+by implementation certain properties, e.g. session-consitency or monotonic read consitency. 
 
-An example for a large scale key-value system is Amazon's Dynamo.
+An example for a large scale key-value system is Amazon's Dynamo. \cite{Vogels2009}
 
-   \item \ldots
-   \item Additional references \ldots
+\item
+In \cite{Stonebraker2010} Michael Stonebraker briefly describes the main differences between SQL databases and NoSQL databases. There are two main categories of NoSQL databases. On the one hand there are "document-style stores", in which a database record consists of key-value pairs and a payload (Examples: MongoDB\footnote{https://www.mongodb.com/} or CouchDB\footnote{http://couchdb.apache.org/}). On the other hand there are "key-value stores", where each record - usually implemented as a distributed hash table - is a key-payload pair (Examples: MemcacheDB\footnote{memcachedb.org} or Amazon Dynamo\footnote{https://aws.amazon.com/de/dynamodb/}).
+
+Performance and flexibility are the two main reasons for using a NoSQL system. The author discusses the performance part while talking about OLTP data. The major performance overhead for SQL systems results by using ODBC or JDBC and not SQL on its own. This overhead is caused by logging, locking, latching and buffer management. If you can remove this overhead your database system is faster, not depending if its in a SQL context or not.
+
+
 \end{packed_enum}
 
 \subsection{System}
@@ -86,7 +71,18 @@ For example: Programming language(s), 3rd-party libraries/frameworks and their
 role in your application pipeline (1 paragraph each), planned/desired
 deployment, \ldots
 
-TODO Daniel
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\textwidth]{img/Arch}
+	\caption{Architectural Overview}
+	\label{fig:Arch}
+\end{figure}
+
+As stated in figure \ref{fig:Arch} the user can interact with the system through an Android application. The data will be fetched in the JSON format through a REST-API. The library used for making API requests is OkHttp\footnote{http://square.github.io/okhttp/}. The data will be cached in a SQLite database using a content provider\footnote{https://github.com/SimonVT/schematic}. The JSON to object conversion will be done by Google's Gson library\footnote{https://github.com/google/gson}. A convenient interface for downloading images and displaying them is Glide\footnote{https://github.com/bumptech/glide}. 
+
+The data will be fetched from an Amazon EC2 micro server\footnote{https://aws.amazon.com/de/ec2/instance-types/} where we use the free trial. The transmitted data will be in the JSON format and by provided by a nodeJS endpoint\footnote{https://nodejs.org/en/}. To access the MongoDB we will use the provided driver\footnote{https://mongodb.github.io/node-mongodb-native/}.
+
+The database will be filled by a crawler, also written in nodeJS. The crawler will be called periodically by a batch job. 
 
 \paragraph{Experimental Data - Google Places}
 
@@ -98,15 +94,14 @@ The data suits our application, because it's easy to parse (JSON) and easy to di
 
 
 \subsection{Roadmap}
-
-TODO Daniel
-
 \emph{Optional}. Split your project into individual steps and provide a first
 roadmap for the project/semester. You may use the \verb|vroadmap| environment
 (see \verb|report.tex| for definition):
 
 \begin{vroadmap}
-  YYYY-mm-dd & Step 1 \tabularnewline
-  YYYY-mm-dd & Step 2 \tabularnewline
-  \ldots & \ldots \tabularnewline
+  2018-04-06 & planning finished (research of tools and frameworks) \tabularnewline
+  2018-04-13 & seperation of tasks and responsibilities \tabularnewline
+  2018-05-04 & first prototype for each part (dummy data possible) \tabularnewline
+  2018-05-11 & prototype finished, testing phase starts \tabularnewline
+  2018-05-22 & testing finished, fixing of possible bugs, finishing the report \tabularnewline
 \end{vroadmap}
