@@ -28,7 +28,21 @@ SQL may exceed the experience workflow and are incapable of providing real-time 
 No SQL on the other side does not fully provide ACID. Which can be problematic for some applications.
 A solution could be the NewSQL systems. Which offer high performance and scalability as well as preserve ACID properties for transactions.
 
-   \item \ldots
+   \item 
+   Large-scale infrastructur services need among other things high availabity and perfomance.
+A way of achivieving this is to use eventual consitency. It is a form of weak consistency
+and guarantees that if no new updates are to an object, eventually all accesses will return
+the last updated value. The period where it's not guaranteed that every observer will see the
+updated value is called inconsitency window. It can be determined based on communication delays,
+the load of the system and the number of replicas involved in the replication scheme.
+ 
+Trading consitency and durability for performance and availabity is not suitable for every
+application, but can yield advantages such as improving read and write perfomance under highly concurrent
+conditions and preventing unavailability. It is possible to improves evneutal consitency 
+by implementation certain properties, e.g. session-consitency or monotonic read consitency.
+
+An example for a large scale key-value system is Amazon's Dynamo.
+
    \item \ldots
    \item Additional references \ldots
 \end{packed_enum}
