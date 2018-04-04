@@ -25,7 +25,7 @@ by implementation certain properties, e.g. session-consitency or monotonic read 
 An example for a large scale key-value system is Amazon's Dynamo. \cite{Vogels2009}
 
 \item
-In \cite{Stonebraker2010} Michael Stonebraker briefly describes the main differences between SQL databases and NoSQL databases. There are two main categories of NoSQL databases. On the one hand there are "document-style stores", in which a database record consists of key-value pairs and a payload (Examples: MongoDB\footnote{https://www.mongodb.com/} or CouchDB\footnote{http://couchdb.apache.org/}). On the other hand there are "key-value stores", where each record - usually implemented as a distributed hash table - is a key-payload pair (Examples: MemcacheDB\footnote{memcachedb.org} or Amazon Dynamo\footnote{https://aws.amazon.com/de/dynamodb/}).
+In \cite{Stonebraker2010} Michael Stonebraker briefly describes the main differences between SQL databases and NoSQL databases. There are two main categories of NoSQL databases. On the one hand there are "document-style stores", in which a database record consists of key-value pairs and a payload (Examples: MongoDB\footnote{https://www.mongodb.com/} or CouchDB\footnote{http://couchdb.apache.org/}). On the other hand there are "key-value stores", where each record - usually implemented as a distributed hash table - is a key-payload pair (Examples: MemcacheDB\footnote{http://memcachedb.org} or Amazon Dynamo\footnote{https://aws.amazon.com/de/dynamodb/}).
 
 Performance and flexibility are the two main reasons for using a NoSQL system. The author discusses the performance part while talking about OLTP data. The major performance overhead for SQL systems results by using ODBC or JDBC and not SQL on its own. This overhead is caused by logging, locking, latching and buffer management. If you can remove this overhead your database system is faster, not depending if its in a SQL context or not.
 
@@ -54,7 +54,7 @@ Beside from this, we also have a little insight in some of the data structures u
 
 \subsection{Application Description}
 
-We decided to write an Android application, which searches a random restaurant from the surrounding area. The idea came up during the time of my bachelor study. We often had problems, choosing a place to have lunch at, since no one wanted to make a final call on where to go.
+We decided to write an Android application, which searches a random restaurant from the surrounding area. The idea came up during the time of our bachelor study. We often had problems, choosing a place to have lunch at, since no one wanted to make a final call on where to go.
 
 The interface is a simple button, which sends a request to the database system with the current position. As a result, a list of restaurants is returned from which a random selection is made and given to the user. If he does not like the choice, it is possible to get another random selection by swiping away the location.
 
@@ -78,7 +78,7 @@ deployment, \ldots
 	\label{fig:Arch}
 \end{figure}
 
-As stated in figure \ref{fig:Arch} the user can interact with the system through an Android application. The data will be fetched in the JSON format through a REST-API. The library used for making API requests is OkHttp\footnote{http://square.github.io/okhttp/}. The data will be cached in a SQLite database using a content provider\footnote{https://github.com/SimonVT/schematic}. The JSON to object conversion will be done by Google's Gson library\footnote{https://github.com/google/gson}. A convenient interface for downloading images and displaying them is Glide\footnote{https://github.com/bumptech/glide}. 
+As stated in figure \ref{fig:Arch}, the user can interact with the system through an Android application. The data will be fetched in the JSON format through a REST-API. The library used for making API requests is OkHttp\footnote{http://square.github.io/okhttp/}. The data will be cached in a SQLite database using a content provider\footnote{https://github.com/SimonVT/schematic}. The JSON to object conversion will be done by Google's Gson library\footnote{https://github.com/google/gson}. A convenient interface for downloading images and displaying them is Glide\footnote{https://github.com/bumptech/glide}, which we use to display the restaurant's image. 
 
 The data will be fetched from an Amazon EC2 micro server\footnote{https://aws.amazon.com/de/ec2/instance-types/} where we use the free trial. The transmitted data will be in the JSON format and by provided by a nodeJS endpoint\footnote{https://nodejs.org/en/}. To access the MongoDB we will use the provided driver\footnote{https://mongodb.github.io/node-mongodb-native/}.
 
@@ -88,7 +88,7 @@ The database will be filled by a crawler, also written in nodeJS. The crawler wi
 
 \url{https://developers.google.com/places/}
 
-We use the Google Places Api with a filter on restaurants. This api takes a latitude/ longitude pair and a radius as input and returns a list (limited by 20 entries) of restaurants. We have to write a JSON Crawler to get more than 20 entries, so we can have a higher area covered by our restaurant list. \\
+We use the Google Places Api with a filter on restaurants. This api takes a latitude/ longitude pair and a radius as input and returns a list (limited by 20 entries) of restaurants. We will write a JSON Crawler to get more than 20 entries, so we can have a higher area covered by our restaurant list. \\
 
 The data suits our application, because it's easy to parse (JSON) and easy to distribute the data into documents by latitude/longitude pairs. Also our planned data access is by design matching MongoDBs architecture, so we will only have to look up in one document for one join.
 
@@ -102,6 +102,6 @@ roadmap for the project/semester. You may use the \verb|vroadmap| environment
   2018-04-06 & planning finished (research of tools and frameworks) \tabularnewline
   2018-04-13 & seperation of tasks and responsibilities \tabularnewline
   2018-05-04 & first prototype for each part (dummy data possible) \tabularnewline
-  2018-05-11 & prototype finished, testing phase starts \tabularnewline
+  2018-05-11 & prototype finished, testing phase starts with real data \tabularnewline
   2018-05-22 & testing finished, fixing of possible bugs, finishing the report \tabularnewline
 \end{vroadmap}
