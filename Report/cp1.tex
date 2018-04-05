@@ -54,13 +54,13 @@ Beside from this, we also have a little insight in some of the data structures u
 
 \subsection{Application Description}
 
-We decided to write an Android application, which searches a random restaurant from the surrounding area. The idea came up during the time of my bachelor study. We often had problems, choosing a place to have lunch at, since no one wanted to make a final call on where to go.
+We decided to write an Android application, which searches a random restaurant from the surrounding area and displays general information about it.
 
-The interface is a simple button, which sends a request to the database system with the current position. As a result, a list of restaurants is returned from which a random selection is made and given to the user. If he does not like the choice, it is possible to get another random selection by swiping away the location.
+The interface is a simple button, which sends a request to the database system with the current position. As a result, a list of restaurants is returned from which a random selection is made and given to the user. If the user does not like the choice, it is possible to get another random selection by swiping away the location.
 
 The displayed data contains the name, location, homepage-link and opening hours of the restaurant. This data is stored in a database and contains restaurants from Salzburg and it's surroundings. 
 
-For our application we need a scalable database system with a fast response time. But since our data is not changed by the users, it is not required to fulfill the ACID properties. Hence, a NoSQL database is enough. A document based system makes sense, since the data used already is close to this format, with the location as a unique key for the rest of the information.
+For this application a scalable database system with a fast response time is needed. But since the data is not changed by the users, it is not required to fulfill the ACID properties. Hence, a NoSQL database is enough. A document based system makes sense, since the data used already is close to this format, with the location as a unique key for the rest of the information.
 
 
 
