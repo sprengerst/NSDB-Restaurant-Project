@@ -2,6 +2,7 @@
 var http = require('http');
 var express = require('express');
 var bodyParser = require('body-parser');
+var geolib = require('geolib');
 
 const dbName = 'RestaurantDB';
 const collectionName = 'Restaurants';
@@ -23,6 +24,7 @@ app.get('/getRestaurants', function (req, res) {
       // Find some documents
       collection.find({}).toArray(function (err, docs) {
         if (!err) {
+          res.writeHead(200, { "Content-Type": "text/json; charset=utf-8" });
           res.write(JSON.stringify(docs));
           res.end();
         } else {
@@ -34,6 +36,58 @@ app.get('/getRestaurants', function (req, res) {
     } else {
       res.status(500);
       res.write('Error connecting to DB');
+      res.end();
+    }
+  });
+});
+
+app.post('/getRestaurantsForLatLngRad', function (req, res) {
+  var lat = 47.8220236;
+  var lng = 13.0385283;
+  var rad = 5;
+
+  if (!isNaN(req.body.lat)) {
+    lat = req.body.lat;
+  }
+
+  if (!isNaN(req.body.lng)) {
+    lng = req.body.lng;
+  }
+
+  if (!isNaN(req.body.rad)) {
+    rad = req.body.rad;
+  }
+
+  MongoClient.connect(url, function (err, client) {
+    if (!err) {
+      // Get DB
+      const db = client.db(dbName);
+
+      // Get the documents collection
+      const collection = db.collection(collectionName);
+
+      collection.find({}).toArray(function (err, docs) {
+        if (!err) {
+          res.writeHead(200, { "Content-Type": "text/json; charset=utf-8" });
+
+          var restaurants = [];
+          for (var val of docs) {
+            if (geolib.isPointInCircle({ latitude: val.geometry.location.lat, longitude: val.geometry.location.lng }, { latitude: lat, longitude: lng }, rad * 1000)) {
+              restaurants.push(val);
+            }
+          }
+
+          res.write(JSON.stringify(restaurants));
+          res.end();
+        } else {
+          res.status(500);
+          res.write('Error reading collection Restaurants');
+          res.end();
+        }
+      });
+    } else {
+      res.status(400);
+      res.write('Invalid request. No id specified.');
       res.end();
     }
   });
