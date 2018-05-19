@@ -33,6 +33,78 @@ Also explain why the respective tools/modifications were required/necessary in
 order to get your application running (or maybe you just used/modified them for
 convenience, which would also be okay).
 
+\subsubsection{Server-Setup}
+We used an instance of Amazon's EC2 Server\footnote{https://aws.amazon.com/de/ec2/}. The server's free trial period lasts for one year, so no fees were charged. We deployed an Ubuntu 16.04 LTS\footnote{http://releases.ubuntu.com/16.04/} instance to the server. When the creation is finished, you receive a SSH-Key for the default user (ubuntu). You can use this key to log into the server.
+
+\paragraph{General Setup}
+With the following commands for each team member (kard, sprs, schf) an user is created, sudo access granted and a SSH key pair generated. The following process can be repeated for any user. 
+\\\\
+Creates an user, \textit{-m} creates a home directory for that user too.
+\begin{lstlisting}
+sudo useradd -m kard
+\end{lstlisting}
+
+Grants root access to the given user.
+\begin{lstlisting}
+sudo usermod -a -G sudo kard
+\end{lstlisting}
+
+Sets a password for the given user, this could be any string generated with random.org, \textit{-e} states that the user has to change the password during his or her next login.
+\begin{lstlisting}
+sudo passwd kard -e
+\end{lstlisting}
+
+The following statement generates a key pair which will later be used to login and needs to be executed on the client as the generated private key should not pass the network (also make sure that ssh-keygen is installed).
+\begin{lstlisting}
+ssh-keygen nsdb-aws-kard
+\end{lstlisting}
+
+Next we will create an \textit{.ssh} directory in the user's home directory and create a file with the authorized keys in it, which will now be empty.
+\begin{lstlisting}
+mkdir .ssh
+touch .ssh/authorized_keys
+\end{lstlisting}
+
+The public key can now be transferred to the server (e.g. the /tmp/ directory is suitable). Then the content of the key will be appended to the \textit{authorized\_keys} file.
+\begin{lstlisting}
+cat /tmp/nsdb-aws-kard.pub >> /home/kard/.ssh/authorized_keys
+\end{lstlisting}
+
+After that the permissions of the directory and the key file need to be adapted in order to be read by the ssh-server.
+\begin{lstlisting}
+sudo chown -R kard:kard .ssh
+sudo chmod 700 .ssh
+sudo chmod 644 .ssh/authorized_keys
+\end{lstlisting}
+
+The user's private key can now be given to the user (make sure that the key is encrypted and the password is transferred on another medium). After that the user is able to login with the key. As we don't need the \textit{ubuntu} user anymore, we can delete him with his home directory.
+\begin{lstlisting}
+sudo deluser ubuntu --remove-home 
+\end{lstlisting}
+
+\paragraph{Security Settings}
+To eliminate the risk of Brute-Force attacks, remote password login is prohibited. This can be done by adding the following line to the SSH config file (/etc/ssh/sshd\_config).
+\begin{lstlisting}
+PasswordAuthentication no
+\end{lstlisting}
+
+Also remote root login is prohibited by changing the following line
+\begin{lstlisting}
+PermitRootLogin prohibit-password
+\end{lstlisting}
+to
+\begin{lstlisting}
+PermitRootLogin no
+\end{lstlisting}
+
+We don't need any firewall on the server, as we can configure a firewall trough the cloud dashboard. We only permit traffic on port 22 (SSH), port 80 (HTTP) and port 443 (HTTPS).
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{img/Security-Group}
+	\caption{Firewall configuration for the instance}
+	\label{fig:SecGroup}
+\end{figure}
+
 \subsection{Datasets}
 
 If you use any additional or different datasets than specified in the previous
