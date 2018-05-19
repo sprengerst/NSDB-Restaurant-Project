@@ -1,3 +1,4 @@
+\newpage
 \section{Implementation}
 
 For long code snippets, we recommend to put them into the appendix of the
@@ -33,10 +34,18 @@ Also explain why the respective tools/modifications were required/necessary in
 order to get your application running (or maybe you just used/modified them for
 convenience, which would also be okay).
 
-\subsubsection{Server-Setup}
+
 We used an instance of Amazon's EC2 Server\footnote{https://aws.amazon.com/de/ec2/}. The server's free trial period lasts for one year, so no fees were charged. We deployed an Ubuntu 16.04 LTS\footnote{http://releases.ubuntu.com/16.04/} instance to the server. When the creation is finished, you receive a SSH-Key for the default user (ubuntu). You can use this key to log into the server.
 
-\paragraph{General Setup}
+\subsubsection{General Setup}
+At first we will update the package-list, the packages itself and the distribution. After that we will clean up the installation. For this procedure the following commands are used.
+\begin{lstlisting}
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+sudo apt-get autoremove
+\end{lstlisting}
+
 With the following commands for each team member (kard, sprs, schf) an user is created, sudo access granted and a SSH key pair generated. The following process can be repeated for any user. 
 \\\\
 Creates an user, \textit{-m} creates a home directory for that user too.
@@ -82,7 +91,7 @@ The user's private key can now be given to the user (make sure that the key is e
 sudo deluser ubuntu --remove-home 
 \end{lstlisting}
 
-\paragraph{Security Settings}
+\subsubsection{Security Setup}
 To eliminate the risk of Brute-Force attacks, remote password login is prohibited. This can be done by adding the following line to the SSH config file (/etc/ssh/sshd\_config).
 \begin{lstlisting}
 PasswordAuthentication no
@@ -104,6 +113,78 @@ We don't need any firewall on the server, as we can configure a firewall trough 
 	\caption{Firewall configuration for the instance}
 	\label{fig:SecGroup}
 \end{figure}
+
+\subsubsection{MongoDB Setup}
+At first we need to install MongoDB. Because the mongodb package provided by Ubuntu is not maintained by MongoDB\footnote{https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/}, we need to add the package-list and keyserver.
+\begin{lstlisting}
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list
+\end{lstlisting}
+
+After that we can update the package-lists and install the official MongoDB package \textit{mongodb-org}.
+\begin{lstlisting}
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+\end{lstlisting}
+
+Now we can run the MongoDB daemon with
+\begin{lstlisting}
+sudo service mongod start
+\end{lstlisting}
+
+To automatically start the server while booting we can enable the service.
+\begin{lstlisting}
+sudo service mongod enable
+\end{lstlisting}
+
+\subsubsection{REST-Service Setup}
+\label{sec:REST-Service}
+The REST-Service is implemented in NodeJS\footnote{https://nodejs.org/en/}. Therefore we need to install NodeJS. This can be done using the following commands.
+\begin{lstlisting}
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+\end{lstlisting}
+
+As the REST-Service needs the following libaries:
+\begin{enumerate}
+	\item \textit{express} - a framework for routing
+	\item \textit{body-parser} - to easily parse POST requests
+	\item \textit{mongodb} - the connector to the DB
+	\item \textit{geolib} - a framework for basic geometric computations.
+\end{enumerate}
+we need to install them with \textit{npm}.
+\begin{lstlisting}
+sudo npm install express --save
+sudo npm install body-parser --save
+sudo npm install mongodb --save
+sudo npm install geolib --save
+\end{lstlisting}
+
+In order to provide the REST-Service as \textit{systemd} service we need to create the according file in the service directory (\textit{/etc/systemd/system/}). The contents of \textit{rest-client.service} are a brief description and the path to the location of the script.
+\begin{lstlisting}
+rest-client.service
+[Unit]
+Description=Rest Client
+
+[Service]
+ExecStart=/var/www/node/restaurant_client.js
+
+[Install]
+WantedBy=multi-user.target
+\end{lstlisting}
+
+The REST-Service should also be available upon boot, so we enable it as well.
+\begin{lstlisting}
+sudo systemctl enable rest-client
+\end{lstlisting}
+
+Because the script would need root privileges to run on any well-known port, but that is not favorable, we run the script on port 8000 and redirect all requests from port 80 to that port using \textit{iptables}.
+\begin{lstlisting}
+sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
+sudo iptables -t nat -D PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
+\end{lstlisting}
+
+\
 
 \subsection{Datasets}
 
@@ -145,6 +226,63 @@ describe how they interact with the remaining parts of your application.
 This section (including its subsection) is supposed to constitue the majority
 of the report which is also reflected in the gradine scheme. Hence, this part of
 the report should at least be 2-3 pages in total (text \emph{and} figures).
+
+\subsubsection{REST-Service}
+The REST-Client is implemented in NodeJS as stated above. The libraries listed in section \ref{sec:REST-Service} help to get a small an well organized structure. The full code is available at Appendix section \ref{app:REST-Service}.
+
+With \textit{express} you can create different routes for your server. Our application consists of three diferent routes. One is \textit{/getRestaurants}, where you get all restaurants which are in the database. This function was mainly used for debug purposes. The second and most important function is \textit{/getRestaurantsForLatLng}. This request is used by the Android-Client to get the current restaurants for its location. The thrid request is \textit{/createOrUpdateRestaurnt}. This is used by the crawler to update existing restaurants or create new ones. The different routes are generated by the following snippet.
+\begin{lstlisting}
+var app = express();
+app.get('/getRestaurants', function (req, res) {
+	...
+});
+
+app.post('/getRestaurantsForLatLngRad', function (req, res) {
+	...
+});
+
+app.post('/createOrUpdateRestaurant', function (req, res) {
+	...
+});
+\end{lstlisting}
+
+A database connection can be established by using the MongoClient which is created the following way.
+\begin{lstlisting}
+var MongoClient = require('mongodb').MongoClient;
+\end{lstlisting} 
+
+The connection can then be created using the following snippet. After trying to connect you can check wheter that operation was successfull by checking the \textit{err} parameter.
+\begin{lstlisting}
+MongoClient.connect(url, function (err, client) {
+	if (!err) {
+		...
+	}
+});
+\end{lstlisting}
+
+The database and collection can be obtained in the following way.
+\begin{lstlisting}
+// Get DB
+const db = client.db(dbName);
+
+// Get the documents collection
+const collection = db.collection(collectionName);
+\end{lstlisting}
+
+The collection can be queried using a JSON-Document as a filter. For example for checking if a restaurant is already in the database we use the following query.
+\begin{lstlisting}
+collection.find({ id: id }).toArray(function (err, docs) {
+	if (!err) {
+		if (docs.length == 0) { // new item
+			...
+		} 
+	}
+});
+\end{lstlisting}
+
+The location-aware request \textit{/getRestaurantForLatLngRad} makes it possible to provide the current location and a radius to look for restaurants in it. To check wheter a restaurant is in the given we range we use geolib's functionality \textit{geolib.isPointInCircle(...)}
+
+
 
 \subsubsection{Key System Features}
 

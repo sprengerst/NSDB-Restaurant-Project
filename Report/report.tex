@@ -14,7 +14,8 @@
 
 \lstset{
 	basicstyle=\ttfamily,
-	frame=single
+	frame=single,
+	breaklines=true
 }
 
 \setlength{\parindent}{0em}
@@ -92,5 +93,10 @@
   \renewcommand{\refname}{References}
   \bibliographystyle{abbrv}
   \bibliography{bibliography}}
+
+\appendix
+\section{REST-Service}
+\label{app:REST-Service}
+\lstinputlisting[numbers=left]{../RestService/restaurants.js}
 
 \end{document}
