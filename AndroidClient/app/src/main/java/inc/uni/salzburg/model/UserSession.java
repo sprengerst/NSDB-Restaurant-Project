@@ -7,10 +7,10 @@ package inc.uni.salzburg.model;
 public class UserSession {
 
     private String geoResolution;
-    private float latitude;
-    private float longitude;
+    private double latitude;
+    private double longitude;
 
-    public UserSession(String geoResolution, float latitude, float longitude) {
+    public UserSession(String geoResolution, double latitude, double longitude) {
         this.geoResolution = geoResolution;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -25,19 +25,19 @@ public class UserSession {
         this.geoResolution = geoResolution;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 }

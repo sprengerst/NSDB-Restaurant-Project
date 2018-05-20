@@ -4,8 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -19,7 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import inc.uni.salzburg.R;
 import inc.uni.salzburg.database.UserSessionUtilities;
 import inc.uni.salzburg.model.UserSession;
 import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
@@ -32,12 +29,12 @@ public class GeoCodingTask extends AsyncTask<Void, Void, String> {
     private final String LOG_TAG = GeoCodingTask.class.getSimpleName();
     private final Context mContext;
 
-    private final float latitude;
-    private final float longitude;
+    private final double latitude;
+    private final double longitude;
 
     private TextView insertTextView;
 
-    public GeoCodingTask(Context context, TextView insertTextView, float latitude, float longitude) {
+    public GeoCodingTask(Context context, TextView insertTextView, double latitude, double longitude) {
         this.mContext = context;
         this.insertTextView = insertTextView;
         this.latitude = latitude;

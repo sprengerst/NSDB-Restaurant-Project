@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(MainActivity.this);
         if (userSession == null) {
-            userSession = new UserSession(null, -1, -1);
+            userSession = new UserSession(null, 47.811195, 13.033229);
             UserSessionUtilities.updateUserSessionSP(MainActivity.this, userSession);
         }
 
@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Place place = PlacePicker.getPlace(MainActivity.this, data);
                     Log.d("MainActivity", "LOCAL: " + place.getLocale() + " Name: " + place.getName());
                     new GeoCodingTask(this, mLocationTextView, (float) place.getLatLng().latitude, (float) place.getLatLng().longitude).execute();
+                    startService(new Intent(MainActivity.this, RestaurantFetchService.class));
                 }
             }
         }

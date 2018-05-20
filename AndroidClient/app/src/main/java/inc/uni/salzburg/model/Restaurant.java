@@ -9,19 +9,17 @@ import android.os.Parcelable;
 
 public class Restaurant implements Parcelable {
 
-    private int id;
+    private String id;
     private String name;
     private String imageUrl;
-    private String rating;
     private double latitude;
     private double longitude;
     private String address;
 
-    public Restaurant(int id, String name, String imageUrl, String rating, double latitude, double longitude, String address) {
+    public Restaurant(String id, String name, String imageUrl, double latitude, double longitude, String address) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
-        this.rating = rating;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
@@ -29,7 +27,7 @@ public class Restaurant implements Parcelable {
 
 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -39,10 +37,6 @@ public class Restaurant implements Parcelable {
 
     public String getImageUrl() {
         return imageUrl;
-    }
-
-    public String getRating() {
-        return rating;
     }
 
     public double getLatitude() {
@@ -63,7 +57,6 @@ public class Restaurant implements Parcelable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", rating='" + rating + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", address='" + address + '\'' +
@@ -77,24 +70,21 @@ public class Restaurant implements Parcelable {
 
         Restaurant that = (Restaurant) o;
 
-        if (id != that.id) return false;
+        if (!id.equals(that.id)) return false;
         if (Double.compare(that.latitude, latitude) != 0) return false;
         if (Double.compare(that.longitude, longitude) != 0) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (imageUrl != null ? !imageUrl.equals(that.imageUrl) : that.imageUrl != null)
             return false;
-        if (rating != null ? !rating.equals(that.rating) : that.rating != null) return false;
-        return address != null ? address.equals(that.address) : that.address == null;
+        return (address != null ? address.equals(that.address) : that.address == null);
     }
 
     @Override
     public int hashCode() {
-        int result;
+        int result = 0;
         long temp;
-        result = id;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (imageUrl != null ? imageUrl.hashCode() : 0);
-        result = 31 * result + (rating != null ? rating.hashCode() : 0);
         temp = Double.doubleToLongBits(latitude);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(longitude);
@@ -117,10 +107,9 @@ public class Restaurant implements Parcelable {
     };
 
     public Restaurant(Parcel in) {
-        this.id = in.readInt();
+        this.id = in.readString();
         this.name = in.readString();
         this.imageUrl = in.readString();
-        this.rating = in.readString();
         this.latitude = in.readDouble();
         this.longitude = in.readDouble();
         this.address = in.readString();
@@ -133,10 +122,9 @@ public class Restaurant implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeString(id);
         dest.writeString(name);
         dest.writeString(imageUrl);
-        dest.writeString(rating);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
         dest.writeString(address);

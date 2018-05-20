@@ -15,7 +15,7 @@ public class RestaurantColumns {
     @PrimaryKey
     public static final String _ID = "_id";
 
-    @DataType(DataType.Type.INTEGER)
+    @DataType(DataType.Type.TEXT)
     @NotNull
     public static final String RESTAURANT_ID = "restaurant_id";
 
@@ -26,10 +26,6 @@ public class RestaurantColumns {
     @DataType(DataType.Type.TEXT)
     @NotNull
     public static final String RESTAURANT_IMAGE_URL="restaurant_image_url";
-
-    @DataType(DataType.Type.TEXT)
-    @NotNull
-    public static final String RESTAURANT_RATING="restaurant_rating";
 
     @DataType(DataType.Type.REAL)
     @NotNull

@@ -16,10 +16,9 @@ public class ModelUtils {
 
     public static Restaurant buildRestaurantFromCursor(Cursor cursor){
         return new Restaurant(
-                cursor.getInt(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_ID)),
+                cursor.getString(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_ID)),
                 cursor.getString(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_NAME)),
                 cursor.getString(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_IMAGE_URL)),
-                cursor.getString(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_RATING)),
                 cursor.getDouble(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_LAT)),
                 cursor.getDouble(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_LON)),
                 cursor.getString(cursor.getColumnIndex(RestaurantColumns.RESTAURANT_ADDRESS))

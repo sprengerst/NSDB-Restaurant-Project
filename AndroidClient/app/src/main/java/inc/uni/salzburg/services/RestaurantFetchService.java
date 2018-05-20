@@ -9,8 +9,10 @@ import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,12 +20,15 @@ import java.util.Map;
 import inc.uni.salzburg.R;
 import inc.uni.salzburg.database.RestaurantColumns;
 import inc.uni.salzburg.database.RestaurantFeedProvider;
-import inc.uni.salzburg.model.ModelUtils;
+import inc.uni.salzburg.database.UserSessionUtilities;
 import inc.uni.salzburg.model.Restaurant;
+import inc.uni.salzburg.model.UserSession;
+import inc.uni.salzburg.utilities.DatabaseUtilities;
 import inc.uni.salzburg.utilities.ServerUtilities;
 
 public class RestaurantFetchService extends IntentService {
 
+    final DecimalFormat df = new DecimalFormat("##.#######");
 
     public RestaurantFetchService() {
         super(RestaurantFetchService.class.getName());
@@ -37,52 +42,53 @@ public class RestaurantFetchService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         try {
+            // delete old entries
             Context context = getApplicationContext();
+            DatabaseUtilities.deleteLocalDatabase(context);
 
             // delete old suggestion db
-            context.getContentResolver().delete(RestaurantFeedProvider.RESTAURANT_FEED.CONTENT_URI, null, null);
 
-            // TODO server connection
-//            Map<String, String> params = new HashMap<>();
-//
-//            String serverUrl = "http://blablaTODO/restaurantDiscovery";
-//            params.put("parameter_TODO", "TEST");
-//
-//            String result = ServerUtilities.post(context, serverUrl, params, -1);
-//
-//            JSONObject resultJsonObject = new JSONObject(result);
-//            boolean success = resultJsonObject.getBoolean("success");
-//            //TODO: handle could not get restaurant from server
-//            if (!success)
-//                return;
+            Map<String, String> params = new HashMap<>();
+
+            UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(context);
 
 
-//            JSONArray restaurantSuggestions = resultJsonObject.getJSONArray("restaurantSuggestions");
-//            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
-//
-//            for (int i = 0; i < restaurantSuggestions.length(); i++) {
-//                JSONObject jsonObject = (JSONObject) restaurantSuggestions.get(i);
-//                boolean alreadyInLocalDB = ModelUtils.checkForRestaurantExistentByID(jsonObject.getInt("restaurant_id"));
-//                // TODO parse json to restaurant
-//                batchOperations.add(buildAddUpdateRestaurantSuggestionOperation(alreadyInLocalDB, jsonObject));
-//            }
-//
-//            // add new suggestions
-//            context.getContentResolver().applyBatch(RestaurantFeedProvider.AUTHORITY, batchOperations);
+            String serverUrl = "http://35.157.39.44/getRestaurantsForLatLngRad";
+            params.put("lat", df.format(userSession.getLatitude()));
+            params.put("lng", df.format(userSession.getLongitude()));
+            params.put("rad", "5");
 
+            String result = ServerUtilities.post(context, serverUrl, params, -1);
 
-            ArrayList<Restaurant> dummyRestaurantList = new ArrayList<>();
+            JSONArray resultJsonObject = new JSONArray(result);
 
-            for (int i = 1; i < 20; i++) {
-                dummyRestaurantList.add(new Restaurant(i, "Test Restaurant " + i, context.getString(R.string.dummy_image_url), "4.3", 47.8029039, 12.9862185, "Salzburg Addresse"));
-            }
+            System.out.println("Complete Restaurant Object: " + resultJsonObject);
+
 
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
 
-            for (Restaurant singleRestaurant : dummyRestaurantList) {
-//                boolean alreadyInLocalDB = ModelUtils.checkForRestaurantExistentByID(singleRestaurant.getId(), this);
-                batchOperations.add(buildAddUpdateRestaurantSuggestionOperation(false, singleRestaurant));
+            for (int i = 0; i < resultJsonObject.length(); i++) {
+                JSONObject singleRes = (JSONObject) resultJsonObject.get(i);
+
+                final String id = singleRes.getString("_id");
+                final String name = singleRes.getString("name");
+                final String address = singleRes.getString("vicinity");
+                final JSONObject location = singleRes.getJSONObject("geometry").getJSONObject("location");
+                final double lat = location.getDouble("lat");
+                final double lng = location.getDouble("lng");
+
+                Restaurant singleRestaurant = new Restaurant(
+                        id,
+                        name,
+                        context.getString(R.string.dummy_image_url),
+                        lat,
+                        lng,
+                        address);
+
+                batchOperations.add(buildAddUpdateRestaurantSuggestionOperation(singleRestaurant));
+
             }
+
             // add new suggestions
             context.getContentResolver().applyBatch(RestaurantFeedProvider.AUTHORITY, batchOperations);
 
@@ -93,25 +99,17 @@ public class RestaurantFetchService extends IntentService {
     }
 
 
-    private ContentProviderOperation buildAddUpdateRestaurantSuggestionOperation(boolean alreadyInLocalDB, Restaurant restaurant) {
+    private ContentProviderOperation buildAddUpdateRestaurantSuggestionOperation(Restaurant restaurant) {
         ContentProviderOperation.Builder builder;
 
-        if (!alreadyInLocalDB) {
-            builder = ContentProviderOperation.newInsert(
-                    RestaurantFeedProvider.RESTAURANT_FEED.CONTENT_URI);
-        } else {
-            builder = ContentProviderOperation.newUpdate(
-                    RestaurantFeedProvider.RESTAURANT_FEED.CONTENT_URI);
-        }
+        builder = ContentProviderOperation.newInsert(
+                RestaurantFeedProvider.RESTAURANT_FEED.CONTENT_URI);
+
 
         try {
 
-            if (alreadyInLocalDB)
-                builder.withSelection(RestaurantColumns.RESTAURANT_ID + "= ?", new String[]{"" + restaurant.getId()});
-
             builder.withValue(RestaurantColumns.RESTAURANT_ID, restaurant.getId());
             builder.withValue(RestaurantColumns.RESTAURANT_NAME, restaurant.getName());
-            builder.withValue(RestaurantColumns.RESTAURANT_RATING, restaurant.getRating());
             builder.withValue(RestaurantColumns.RESTAURANT_IMAGE_URL, restaurant.getImageUrl());
             builder.withValue(RestaurantColumns.RESTAURANT_LAT, restaurant.getLatitude());
             builder.withValue(RestaurantColumns.RESTAURANT_LON, restaurant.getLongitude());
