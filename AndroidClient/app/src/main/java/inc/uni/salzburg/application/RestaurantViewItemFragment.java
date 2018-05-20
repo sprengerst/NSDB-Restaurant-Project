@@ -40,7 +40,7 @@ public class RestaurantViewItemFragment extends Fragment {
             Restaurant restaurant = getArguments().getParcelable(ARG_RESTAURANT);
             View rootView = inflater.inflate(R.layout.fragment_restaurant_view_item, container, false);
 
-            if(restaurant != null) {
+            if (restaurant != null) {
                 TextView restaurantName = rootView.findViewById(R.id.restaurant_name);
                 restaurantName.setText(restaurant.getName());
 
@@ -50,9 +50,7 @@ public class RestaurantViewItemFragment extends Fragment {
                         .apply(new RequestOptions().centerCrop())
                         .into(restaurantImage);
 
-                final String distanceString = String.format(
-                        getContext().getString(R.string.string_km_format),
-                        CalculationUtilities.calculateDistance(restaurant.getLatitude(), restaurant.getLongitude(), getContext()));
+                final String distanceString = String.format(getString(R.string.distance_text), CalculationUtilities.calculateDistance(restaurant.getLatitude(), restaurant.getLongitude(), getContext()));
 
                 TextView restaurantDistance = rootView.findViewById(R.id.restaurant_distance);
                 restaurantDistance.setText(distanceString);
