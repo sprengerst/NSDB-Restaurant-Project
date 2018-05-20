@@ -55,10 +55,12 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(SettingsActivity.this);
-        userSession.setRadius(mSeekbarValue);
-        UserSessionUtilities.updateUserSessionSP(SettingsActivity.this, userSession);
-        startService(new Intent(SettingsActivity.this, RestaurantFetchService.class));
+        if(mSeekbarValue != 0) {
+            UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(SettingsActivity.this);
+            userSession.setRadius(mSeekbarValue);
+            UserSessionUtilities.updateUserSessionSP(SettingsActivity.this, userSession);
+            startService(new Intent(SettingsActivity.this, RestaurantFetchService.class));
+        }
         super.onBackPressed();
     }
 }
