@@ -186,6 +186,21 @@ sudo iptables -t nat -D PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 808
 
 \
 
+
+\subsubsection{Android Setup}
+\label{sec:Android-Setup}
+This project is based on Android therefore the following software is necessary to build the project mobile client:
+
+\begin{enumerate}
+	\item \textit{Android Studio} - 3.1.2 - IDE for building Android projects
+	\item \textit{Android SDK} - 27 for 8.1 Oreo - library for building apps
+	\item \textit{Google Play  Services} - 49 - necessary for Google Places API
+	\item \textit{Oracle JDK} - 8 - is necessary, because Android is based on Java/Kotlin
+\end{enumerate}
+
+All other necessary software for this project like a gradle wrapper or various third parties should be downloaded automatically, while the project is built by Android Studio.
+
+
 \subsection{Datasets}
 
 If you use any additional or different datasets than specified in the previous
@@ -282,7 +297,20 @@ collection.find({ id: id }).toArray(function (err, docs) {
 
 The location-aware request \textit{/getRestaurantForLatLngRad} makes it possible to provide the current location and a radius to look for restaurants in it. To check wheter a restaurant is in the given we range we use geolib's functionality \textit{geolib.isPointInCircle(...)}
 
+\subsubsection{Android Application}
 
+The application consists of three main visual interaction parts, a SQLite database and a http calling functionallity to communicate with the server. The following paragraphs will explain the most important parts.
+
+\paragraph{UI - Restaurant Discovery}
+The restaurant discovery is a visual snapshot of the devices SQLite database contents, therefore this means that all temporarely saved restaurants are visualised in a horizontal list. This list is swipeable and updates as the underlying database updates. This custom implementation is based on a horizontal Viewpager which is available from the Android-SDK.
+\paragraph{UI - Place Selection}
+The location selection lets the user select a location. This functionallity is based on the Google PlacePicker which returns pairs of latitude and longitude for each location. After the location has chosen, a fresh request is sent to the server and the restaurant list gets an update.
+\paragraph{UI - Range Filters}
+As range is important in terms of location, the user can select his desired search range in kilometers inside the 'Settings' tab. Based on the preferences the server query is altered and another dataset returned.
+\paragraph{SQLite DB - Adapter Setup}
+The SQLite database only consists of a single table for the restaurants. The most important fields like name, address, imageurl, etc.. are saved there. We have chosen an adapter setup where changes in the database lead to an immediate response in the UI components.
+\paragraph{Network Calling}
+Networking in Java is pretty simple, therefore we just open up a 'HttpURLConnection' to our server and make a post with the explained parameters. After that we parse the restaurant list which we get in response. With this list we fill the local Android database and notify all adapters about this update. 
 
 \subsubsection{Key System Features}
 
