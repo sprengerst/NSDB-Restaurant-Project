@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         KTValueBar mSeekBar = findViewById(R.id.radius_seekbar);
         UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(SettingsActivity.this);
-        mSeekBar.setParams(new KTValueBarParams.Builder().setActualValue(userSession.getRadius()).build());
+        mSeekBar.setParams(new KTValueBarParams.Builder().setActualValue(userSession.getRadius()).setMinValue(1).setMaxValue(40).build());
         radiusText.setText(String.format("%d km", userSession.getRadius()));
 
         mSeekBar.setValueBarChangedListener(new KTValueBarChangedListener() {
