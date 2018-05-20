@@ -54,9 +54,9 @@ public class RestaurantFetchService extends IntentService {
 
 
             String serverUrl = "http://35.157.39.44/getRestaurantsForLatLngRad";
-            params.put("lat", df.format(userSession.getLatitude()));
-            params.put("lng", df.format(userSession.getLongitude()));
-            params.put("rad", "5");
+            params.put("lat", df.format(userSession.getLatitude()).replace(",","."));
+            params.put("lng", df.format(userSession.getLongitude()).replace(",","."));
+            params.put("rad", String.valueOf(userSession.getRadius()));
 
             String result = ServerUtilities.post(context, serverUrl, params, -1);
 
@@ -77,6 +77,7 @@ public class RestaurantFetchService extends IntentService {
                 final double lat = location.getDouble("lat");
                 final double lng = location.getDouble("lng");
 
+                // TODO replace with real image url
                 Restaurant singleRestaurant = new Restaurant(
                         id,
                         name,

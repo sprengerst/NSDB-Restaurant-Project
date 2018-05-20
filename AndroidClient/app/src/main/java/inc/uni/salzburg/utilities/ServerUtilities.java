@@ -1,7 +1,23 @@
 package inc.uni.salzburg.utilities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.GeoDataApi;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.PlacePhotoResponse;
+import com.google.android.gms.location.places.PlacePhotoResult;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,11 +29,10 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
+import inc.uni.salzburg.application.StartupApplication;
 
 /**
  * Created by Stefan Sprenger on 27.03.2018.
- *
  */
 
 public class ServerUtilities {
@@ -115,6 +130,42 @@ public class ServerUtilities {
             Log.d(LOG_TAG, e.toString());
             throw e;
         }
+    }
+
+
+    // Request photos and metadata for the specified place.
+    public static void getPlacePhotoByID(String placeId, Context context, final ImageView imageView) {
+
+        Log.d("SU", "Photo loading triggered: " + placeId);
+        final StartupApplication startupApplication = ((StartupApplication) context.getApplicationContext());
+
+        final Task<PlacePhotoMetadataResponse> photoMetadataResponse = startupApplication.getClient().getPlacePhotos(placeId);
+        photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
+                // Get the list of photos.
+                PlacePhotoMetadataResponse photos = task.getResult();
+                // Get the PlacePhotoMetadataBuffer (metadata for all of the photos).
+                PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                // Get the first photo in the list.
+                PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+                photoMetadataBuffer.release();
+                // Get the attribution text.
+                CharSequence attribution = photoMetadata.getAttributions();
+                // Get a full-size bitmap for the photo.
+                Task<PlacePhotoResponse> photoResponse = startupApplication.getClient().getPhoto(photoMetadata);
+                photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
+                    @Override
+                    public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
+                        PlacePhotoResponse photo = task.getResult();
+                        Bitmap bitmap = photo.getBitmap();
+                        if (imageView != null) {
+                            imageView.setImageBitmap(bitmap);
+                        }
+                    }
+                });
+            }
+        });
     }
 
 }

@@ -58,6 +58,9 @@ public class RestaurantViewItemFragment extends Fragment {
                         .apply(new RequestOptions().centerCrop())
                         .into(restaurantImage);
 
+
+//                ServerUtilities.getPlacePhotoByID(restaurant.getId(), getContext(),restaurantImage);
+
                 final String distanceString = String.format(getString(R.string.distance_text), CalculationUtilities.calculateDistance(restaurant.getLatitude(), restaurant.getLongitude(), getContext()));
 
                 TextView restaurantDistance = rootView.findViewById(R.id.restaurant_distance);

@@ -18,9 +18,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import inc.uni.salzburg.R;
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int REQUEST_LOCATION_MAIN = 9874;
 
+    private static final String LOG_TAG = "MA";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +56,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(MainActivity.this);
         if (userSession == null) {
-            userSession = new UserSession(null, 47.811195, 13.033229);
+            userSession = new UserSession(null, 47.811195, 13.033229, 2);
             UserSessionUtilities.updateUserSessionSP(MainActivity.this, userSession);
         }
+
+        initGoogleServices();
 
         setContentView(R.layout.activity_main);
 
@@ -128,6 +135,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void updateUserPositionToolbar() {
         final UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(MainActivity.this);
         Log.d("MA", "Update user postion with: " + userSession.getGeoResolution());
@@ -140,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    public void updateUserLocationResolution(String resolution){
-        if(mLocationTextView != null) {
+    public void updateUserLocationResolution(String resolution) {
+        if (mLocationTextView != null) {
             mLocationTextView.setText(resolution);
         }
     }
@@ -202,4 +220,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
     }
+
+
+    private void initGoogleServices() {
+        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this).
+                addApi(Places.GEO_DATA_API).
+                addApi(Places.PLACE_DETECTION_API).
+                enableAutoManage(MainActivity.this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.e(LOG_TAG, "Google connection failed");
+                    }
+                }).
+                build();
+
+        StartupApplication startupApplication = ((StartupApplication) getApplicationContext());
+        startupApplication.setClient(Places.getGeoDataClient(this));
+    }
+
+
 }
