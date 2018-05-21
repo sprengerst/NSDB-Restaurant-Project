@@ -77,11 +77,25 @@ public class RestaurantFetchService extends IntentService {
                 final double lat = location.getDouble("lat");
                 final double lng = location.getDouble("lng");
 
-                // TODO replace with real image url
+                String imageUrl;
+
+                imageUrl = singleRes.getString("icon");
+                if(singleRes.has("photos")){
+                    JSONArray photos = singleRes.getJSONArray("photos");
+                    if(photos.length() > 0){
+                        JSONObject photo = (JSONObject)photos.get(0);
+                        final String photoRef = photo.getString("photo_reference");
+                        imageUrl = "http://maps.googleapis.com/maps/api/place/photo?" +
+                                "maxwidth=400" +
+                                "&photoreference=" +photoRef +
+                                "&key=AIzaSyB9gHbsVRp0nqRS0xMmoeSjL6NkO7zTDjw";
+                    }
+                }
+
                 Restaurant singleRestaurant = new Restaurant(
                         id,
                         name,
-                        context.getString(R.string.dummy_image_url),
+                        imageUrl,
                         lat,
                         lng,
                         address);
