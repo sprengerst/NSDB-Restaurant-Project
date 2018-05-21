@@ -54,8 +54,8 @@ public class RestaurantFetchService extends IntentService {
 
 
             String serverUrl = "http://35.157.39.44/getRestaurantsForLatLngRad";
-            params.put("lat", df.format(userSession.getLatitude()).replace(",","."));
-            params.put("lng", df.format(userSession.getLongitude()).replace(",","."));
+            params.put("lat", df.format(userSession.getLatitude()).replace(",", "."));
+            params.put("lng", df.format(userSession.getLongitude()).replace(",", "."));
             params.put("rad", String.valueOf(userSession.getRadius()));
 
             String result = ServerUtilities.post(context, serverUrl, params, -1);
@@ -79,16 +79,18 @@ public class RestaurantFetchService extends IntentService {
 
                 String imageUrl;
 
-                imageUrl = singleRes.getString("icon");
-                if(singleRes.has("photos")){
+                imageUrl = context.getString(R.string.dummy_image_url);
+                if (singleRes.has("photos")) {
                     JSONArray photos = singleRes.getJSONArray("photos");
-                    if(photos.length() > 0){
-                        JSONObject photo = (JSONObject)photos.get(0);
+                    if (photos.length() > 0) {
+                        JSONObject photo = (JSONObject) photos.get(0);
                         final String photoRef = photo.getString("photo_reference");
-                        imageUrl = "http://maps.googleapis.com/maps/api/place/photo?" +
-                                "maxwidth=400" +
-                                "&photoreference=" +photoRef +
-                                "&key=AIzaSyB9gHbsVRp0nqRS0xMmoeSjL6NkO7zTDjw";
+                        imageUrl = "https://maps.googleapis.com/maps/api/place/photo?" +
+                                "photoreference=" + photoRef +
+                                "&key=AIzaSyB9gHbsVRp0nqRS0xMmoeSjL6NkO7zTDjw" +
+                                "&maxheight=800" +
+                                "&maxwidth=800" +
+                                "&sensor=false";
                     }
                 }
 
