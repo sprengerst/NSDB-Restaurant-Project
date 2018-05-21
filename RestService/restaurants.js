@@ -9,8 +9,12 @@ const collectionName = 'Restaurants';
 const url = 'mongodb://localhost:27017';
 
 var MongoClient = require('mongodb').MongoClient;
+
 var app = express();
 app.use(bodyParser.json());
+
+var privateApp = express();
+privateApp.use(bodyParser.json());
 
 app.get('/getRestaurants', function (req, res) {
   MongoClient.connect(url, function (err, client) {
@@ -93,7 +97,7 @@ app.post('/getRestaurantsForLatLngRad', function (req, res) {
   });
 });
 
-app.post('/createOrUpdateRestaurant', function (req, res) {
+privateApp.post('/createOrUpdateRestaurant', function (req, res) {
   MongoClient.connect(url, function (err, client) {
     if (!err) {
       // Get DB
@@ -158,4 +162,8 @@ app.post('/createOrUpdateRestaurant', function (req, res) {
 
 http.createServer(app).listen(8080, function () {
   console.log('Server started on port 8080');
+});
+
+http.createServer(privateApp).listen(8081, function () {
+  console.log('Private-Server started on port 8081');
 });
