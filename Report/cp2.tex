@@ -38,6 +38,7 @@ convenience, which would also be okay).
 We used an instance of Amazon's EC2 Server\footnote{https://aws.amazon.com/de/ec2/}. The server's free trial period lasts for one year, so no fees were charged. We deployed an Ubuntu 16.04 LTS\footnote{http://releases.ubuntu.com/16.04/} instance to the server. When the creation is finished, you receive a SSH-Key for the default user (ubuntu). You can use this key to log into the server.
 
 \subsubsection{General Setup}
+\label{sec:setup}
 At first we will update the package-list, the packages itself and the distribution. After that we will clean up the installation. For this procedure the following commands are used.
 \begin{lstlisting}
 sudo apt-get update
@@ -183,6 +184,11 @@ Because the script would need root privileges to run on any well-known port, but
 sudo iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 sudo iptables -t nat -D PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
 \end{lstlisting}
+In order to persist the iptables rules we need to install the package \textit{iptables-persistent} and save the rules with the according command.
+\begin{lstlisting}
+sudo apt-get install iptables-persistent
+service iptables save
+\end{lstlisting}
 
 \
 
@@ -296,6 +302,17 @@ collection.find({ id: id }).toArray(function (err, docs) {
 \end{lstlisting}
 
 The location-aware request \textit{/getRestaurantForLatLngRad} makes it possible to provide the current location and a radius to look for restaurants in it. To check wheter a restaurant is in the given we range we use geolib's functionality \textit{geolib.isPointInCircle(...)}
+
+The service to get the restaurants should be available to the public, but the create/update service should just be accesible from localhost. In order to achieve that, two servers are created, one for port 8080 (get) and and for port 8081 (create and update). As seen in section \ref{sec:setup}, HTTP(S) traffic is forwarded to port 8080, all other ports are blocked.
+\begin{lstlisting}
+http.createServer(app).listen(8080, function () {
+	console.log('Server started on port 8080');
+});
+
+http.createServer(privateApp).listen(8081, function () {
+	console.log('Private-Server started on port 8081');
+});
+\end{lstlisting}
 
 \subsubsection{Android Application}
 

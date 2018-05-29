@@ -40,14 +40,14 @@ public class ServerUtilities {
     private static final String LOG_TAG = "SU";
     private static final int BACKOFF_MILLI_SECONDS = 2000;
 
-    public static String post(Context context, String serverUrl, final Map<String, String> params, int indexCount) throws IOException {
+    public static String post(Context context, String serverUrl, String body, int indexCount) throws IOException {
 
         int backoff = BACKOFF_MILLI_SECONDS;
         int i = 0;
         while (i != indexCount) {
             Log.d(LOG_TAG, "Attempt #" + i + " to postProcedure");
             try {
-                return postProcedure(serverUrl, params);
+                return postProcedure(serverUrl, body);
             } catch (IOException e) {
                 // Here we are simplifying and retrying on any error; in a real
                 // application, it should retry only on unrecoverable errors
@@ -73,9 +73,8 @@ public class ServerUtilities {
         return null;
     }
 
-    private static String postProcedure(String endpoint, Map<String, String> params)
+    private static String postProcedure(String endpoint, String body)
             throws IOException {
-
 
         URL url;
         try {
@@ -83,18 +82,7 @@ public class ServerUtilities {
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("invalid url: " + endpoint);
         }
-        StringBuilder bodyBuilder = new StringBuilder();
-        Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator();
-        // constructs the POST body using the parameters
-        while (iterator.hasNext()) {
-            Map.Entry<String, String> param = iterator.next();
-            bodyBuilder.append(param.getKey()).append('=')
-                    .append(param.getValue());
-            if (iterator.hasNext()) {
-                bodyBuilder.append('&');
-            }
-        }
-        String body = bodyBuilder.toString();
+
         Log.v(LOG_TAG, "Posting '" + body + "' to " + url);
         byte[] bytes = body.getBytes();
         try {
@@ -104,7 +92,7 @@ public class ServerUtilities {
             conn.setFixedLengthStreamingMode(bytes.length);
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type",
-                    "application/x-www-form-urlencoded;charset=UTF-8");
+                    "application/json;charset=UTF-8");
             // postProcedure the request
             OutputStream out = conn.getOutputStream();
             out.write(bytes);

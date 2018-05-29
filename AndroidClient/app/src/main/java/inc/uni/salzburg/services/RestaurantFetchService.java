@@ -48,17 +48,17 @@ public class RestaurantFetchService extends IntentService {
 
             // delete old suggestion db
 
-            Map<String, String> params = new HashMap<>();
 
             UserSession userSession = UserSessionUtilities.getCurrentUserSessionSP(context);
 
-
             String serverUrl = "http://35.157.39.44/getRestaurantsForLatLngRad";
-            params.put("lat", df.format(userSession.getLatitude()).replace(",", "."));
-            params.put("lng", df.format(userSession.getLongitude()).replace(",", "."));
-            params.put("rad", String.valueOf(userSession.getRadius()));
 
-            String result = ServerUtilities.post(context, serverUrl, params, -1);
+            JSONObject body = new JSONObject();
+            body.put("lat", userSession.getLatitude());
+            body.put("lng", userSession.getLongitude());
+            body.put("rad", userSession.getRadius());
+
+            String result = ServerUtilities.post(context, serverUrl, body.toString(), -1);
 
             JSONArray resultJsonObject = new JSONArray(result);
 
