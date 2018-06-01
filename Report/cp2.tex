@@ -224,6 +224,7 @@ limited to) the programming language/tools and how you ensure that your datasets
 satisfy the desired characteristics.
 
 \subsubsection{Import}
+\label{sec:Import}
 
 Discuss the import process here (including code snippets). Did you apply any
 transformations before the data is stored in the underlying database system?
@@ -373,7 +374,55 @@ As range is important in terms of location, the user can select his desired sear
 \paragraph{SQLite DB - Adapter Setup}
 The SQLite database only consists of a single table for the restaurants. The most important fields like name, address, imageurl, etc.. are saved there. We have chosen an adapter setup where changes in the database lead to an immediate response in the UI components.
 \paragraph{Network Calling}
-Networking in Java is pretty simple, therefore we just open up a 'HttpURLConnection' to our server and make a post with the explained parameters. After that we parse the restaurant list which we get in response. With this list we fill the local Android database and notify all adapters about this update. 
+Networking in Java is pretty simple, therefore we just open up a 'HttpURLConnection' to our server and make a post with the explained parameters. After that we parse the restaurant list which we get in response. With this list we fill the local Android database and notify all adapters about this update.
+
+\subsubsection{JavaScript Crawler}
+In order to get data from the Google Places API a JavaScript Crawler was written. It can be split into three parts (retrieving data, processing data and uploading data). Since Google Places only sends a maximum of 60 results it was necessary to perform multiple API requests with different GPS coordinates. The following snippet contains the code to send out all the requests.
+
+\begin{lstlisting}
+// Crawl over every search coordinate
+coordinates.forEach(function(element) {
+
+  continueCrawl = true;
+
+  // Define request String
+  var location = element.loc;
+  var radius = element.rad; //meters
+  // Can be extended in the future
+  var type = "restaurant";
+  requestString = searchRequest + "location=" + location + "&radius=" + radius + "&type=" + type +"&key=" + apiKey;
+  
+  // Continue crawling until there is no next page
+  while (continueCrawl) {
+    xmlhttp.open("GET",requestString, false);
+    xmlhttp.send();
+    sleep(500);
+  }
+});
+\end{lstlisting}
+
+At first the \textit{requestString} is added together with the different coordinates. After that the callout is made with \textit{xmlhttp.open} and \textit{xmlhttp.send}. The sleep function is necessary, because the \textit{nextPageToken} needs a short time to be generated. Calling the page immediately would result in an error.
+
+After a result is retrieved, all the unnecessary data is deleted, the restaurants are added to an array and the \textit{nextPageToken} is being added to the \textit{searchString}. If the response contained no page token, a new request to the API with different coordinates is being made. The following snippet shows how page Tokens are added or replaced in the search String.
+\begin{lstlisting}
+if ("next_page_token" in myArr) {
+      // If it's not the initial request only the next_page_token needs
+      // to be added
+      var i = requestString.indexOf("&pagetoken");
+      if (i != -1) {
+        requestString = requestString.slice(0,176);
+        requestString += myArr["next_page_token"];
+
+      // Replace the pagetoken
+      } else {
+        requestString += "&pagetoken=" + myArr["next_page_token"];     
+      }
+}
+\end{lstlisting}
+
+If the \textit{searchString} already contains a page Token, the String is sliced and the token is added. Otherwise the parameter "\&pagetoken" and the token is added to the string.
+
+The upload part was already described previously under \ref{sec:Import}. The whole code for the Crawler is also appended to the end.
 
 \subsubsection{Key System Features}
 
