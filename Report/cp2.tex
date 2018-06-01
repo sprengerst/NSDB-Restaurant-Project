@@ -19,8 +19,7 @@ resources that were useful to you (even without description).
    \item Udacity Full Stack Web Developer Nano Degree\footnote{https://github.com/dkarnutsch/ud-linux-server} - One part of the course is a basic server setup with basic security considerations. We used that course as a base. Additional information about how to configure a server were found with web searches.  
    \item MongoDB Installation Guide\footnote{https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/} - Offical documentation on how to install MongoDB on Ubuntu 16.04. Important part here was to use the offical package \textit{mongodb-org} and not the Ubuntu built-in \textit{mongodb}. 
    \item MongoDB NodeJS Drier\footnote{http://mongodb.github.io/node-mongodb-native/3.0/} - Offical documentation on how to use the MongoDB NodeJS Driver. Mostly used for using CRUD operations. 
-   \item \ldots
-   \item Additional resource \ldots
+   \item The official Google Places API\footnote{https://developers.google.com/places/web-service/intro?hl=de} was used to gain information the exact API callout is made and what information the response contains.
 \end{packed_enum}
 
 \subsection{Setup}
@@ -236,6 +235,53 @@ datasets? Did you put some effort into optimizing the import process? If so,
 reason about the necessity (for example, because of very long runtimes without
 optimizations) and briefly describe why the optimizations did (not) improve your
 import process (1 paragraph each).
+
+As described in Checkpoint 1, we used Data from Google Places. Since it is possible to get the data in JSON format we did not have to apply any transformation. The only thing we had to do was to delete needless data. The following snippet shows the removing process. \textit{Element} represents one restaurant from a Google API response.
+
+\begin{lstlisting}
+delete element.icon;
+delete element.rating;
+delete element.types;
+delete element.scope;
+delete element.reference;
+delete element.place_id;
+delete element.geometry.viewport;
+if (element.opening_hours != undefined) {
+	delete element.opening_hours.weekday_text;
+}
+\end{lstlisting}
+
+In most cases the simple command \textit{delete element.attribute} was enough. But in one case a check up was required to delete nested attributes. This was necessary, because not all restaurants had this information and hence the attribute was undefined. Which causes an error when trying to delete the nested attribute. The remaining attributes were:
+
+\begin{itemize}  
+\item Geometry(location(lat, lang))
+\item id
+\item name
+\item opening\char`_hours(open\char`_now)
+\item photos(height, html\char`_attributes, photo\char`_reference, width)
+\item vicinity
+\end{itemize}
+
+In order to upload the restaurants to the server. Single JSON objects were given to the REST API. The upload code can be seen in the following snippet.
+
+\begin{lstlisting}
+allRestaurants.forEach(function(element) {
+  var restaurant = JSON.stringify(element);
+  uploadData(restaurant);
+});
+
+function uploadData(data) {
+  var xmlHttpr = new XMLHttpRequest();
+  var url = "http://35.157.39.44/createOrUpdateRestaurant";
+  xmlHttpr.open("POST", url , false);
+  xmlHttpr.setRequestHeader("Content-Type", "application/json");
+  xmlHttpr.send(data);
+}
+\end{lstlisting}
+
+The Array \textit{allRestaurants} contains all crawled restaurants as JSON objects. The REST API takes a single JSON string and adds or updates the object in the database. Hence, for every restaurant a callout was made, containing a JSON string as body. In order to make debugging easier, the callouts where made synchronously.
+
+
 
 \subsection{Implementation}
 
