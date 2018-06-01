@@ -237,7 +237,7 @@ reason about the necessity (for example, because of very long runtimes without
 optimizations) and briefly describe why the optimizations did (not) improve your
 import process (1 paragraph each).
 
-As described in Checkpoint 1, we used Data from Google Places. Since it is possible to get the data in JSON format we did not have to apply any transformation. The only thing we had to do was to delete needless data. The following snippet shows the removing process. \textit{Element} represents one restaurant from a Google API response.
+As described in Checkpoint 1, we used Data from Google Places. Since it is possible to get the data in JSON format we did not have to apply any transformation. The only thing we had to do, was to delete needless data. The following snippet shows the removing process. \textit{Element} represents one restaurant from a Google API response.
 
 \begin{lstlisting}
 delete element.icon;
@@ -471,4 +471,4 @@ The setup would probably be as easy as it was for MongoDB. There are packages fo
 There is also a db driver for NodeJS available, but the usage would be quite different. First of all there would be the need to write SQL queries. Its not possible to use the easy JSON syntax provided by MongoDB. Also the data would look different as you have to respect normalization rules. This would lead to many different tables and therefore a lot of joins.
 
 \paragraph{Flexibility and Scalability}
-The MySQL model is not as flexible as the MongoDB model, as changes in the data are distributed over many tables. Also SQL queries would need adaption. However there are sharding options for MySQL too\footnote{https://downloads.mysql.com/docs/fabric-1.5-en.a4.pdf}, but currently its hard to argue that its easier to use than MonoDB sharding. 
+The MySQL model is not as flexible as the MongoDB model, as changes in the data are distributed over many tables. Also SQL queries would need adaption. However there are sharding options for MySQL too\footnote{https://downloads.mysql.com/docs/fabric-1.5-en.a4.pdf}, but currently it's hard to argue that it's easier to use than MonoDB sharding. 
