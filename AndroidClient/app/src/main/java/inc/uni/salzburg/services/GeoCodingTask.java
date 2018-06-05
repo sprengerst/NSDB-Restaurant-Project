@@ -1,6 +1,7 @@
 package inc.uni.salzburg.services;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import inc.uni.salzburg.application.MainActivity;
 import inc.uni.salzburg.database.UserSessionUtilities;
 import inc.uni.salzburg.model.UserSession;
 import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
@@ -27,14 +29,14 @@ import inc.uni.salzburg.utilities.ErrorHandlingUtilities;
  */
 public class GeoCodingTask extends AsyncTask<Void, Void, String> {
     private final String LOG_TAG = GeoCodingTask.class.getSimpleName();
-    private final Context mContext;
+    private final MainActivity mContext;
 
     private final double latitude;
     private final double longitude;
 
     private TextView insertTextView;
 
-    public GeoCodingTask(Context context, TextView insertTextView, double latitude, double longitude) {
+    public GeoCodingTask(MainActivity context, TextView insertTextView, double latitude, double longitude) {
         this.mContext = context;
         this.insertTextView = insertTextView;
         this.latitude = latitude;
@@ -181,6 +183,9 @@ public class GeoCodingTask extends AsyncTask<Void, Void, String> {
             userSession.setLatitude(latitude);
             userSession.setLongitude(longitude);
             UserSessionUtilities.updateUserSessionSP(mContext, userSession);
+
+            mContext.startService(new Intent(mContext, RestaurantFetchService.class));
+
 
         } else {
             if (ErrorHandlingUtilities.isNetworkAvailableWithToast(mContext)) {

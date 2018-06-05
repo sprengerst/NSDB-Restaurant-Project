@@ -213,8 +213,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Place place = PlacePicker.getPlace(MainActivity.this, data);
                     Log.d("MainActivity", "LOCAL: " + place.getLocale() + " Name: " + place.getName());
                     new GeoCodingTask(this, mLocationTextView, (float) place.getLatLng().latitude, (float) place.getLatLng().longitude).execute();
-                    startService(new Intent(MainActivity.this, RestaurantFetchService.class));
-                    getSupportLoaderManager().restartLoader(RESTAURANT_FEED_LOADER, null, this);
                 }
             }
         }
